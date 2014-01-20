@@ -59,7 +59,7 @@ plugin.set_sample_rate(SampleRate)
 plugin.set_block_size(2048)
 
 if plugin.has_editor():
-  raise_gui(plugin)
+  vstgui.raise_gui(plugin)
 
 dump_effect_properties(plugin)
 
