@@ -3,10 +3,10 @@
 from setuptools import setup
 
 setup(name='pyvst',
-      version='0.1.0',
+      version='0.2.0',
       description='Python ctypes-based VST wrapper',
-      author='Matthieu Brucher',
-      author_email='matthieu.brucher@gmail.com',
+      author='Matthieu Brucher, Lucio Asnaghi',
+      author_email='matthieu.brucher@gmail.com, kunitoki@gmail.com',
       packages=['pyvst', ],
       classifiers =
             [ 'Development Status :: 4 - Beta',

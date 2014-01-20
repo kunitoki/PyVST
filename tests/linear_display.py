@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import matplotlib.pyplot as pyplot
 import numpy
@@ -7,18 +7,6 @@ from pyvst import *
 
 SampleRate = 96000
 Samples = 2**21
-
-def raise_gui(plugin):
-  import wx
-
-  app = wx.App()
-  frame = wx.Frame(None, -1, "Plugin editor")
-
-  plugin.open_edit(frame.GetHandle())
-  rect = plugin.get_erect()
-  frame.SetClientSize((rect.right, rect.bottom))
-  frame.Show()
-  app.MainLoop()
 
 def display(plugin, type):
   input1 = numpy.random.randn(Samples).astype(numpy.float32)

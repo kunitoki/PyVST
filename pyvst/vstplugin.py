@@ -1,111 +1,12 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import numpy
 from ctypes import CDLL, POINTER
 
 from aeffect import *
+from aeffectx import *
 
 kVstVersion = 2400
-
-class VstAEffectFlags(object):
-  effFlagsHasEditor     = 1 << 0
-  effFlagsCanReplacing  = 1 << 4
-  effFlagsProgramChunks = 1 << 5
-  effFlagsIsSynth       = 1 << 8
-  effFlagsNoSoundInStop = 1 << 9
-  effFlagsCanDoubleReplacing = 1 << 12
-
-class AEffectOpcodes(object):
-  effOpen = 0
-  effClose = 1
-
-  effSetProgram = 2
-  effGetProgram = 3
-  effSetProgramName = 4
-  effGetProgramName = 5
-
-  effGetParamLabel = 6
-  effGetParamDisplay = 7
-  effGetParamName = 8
-
-  effSetSampleRate = 10
-  effSetBlockSize = 11
-  effMainsChanged = 12
-
-  effEditGetRect = 13
-  effEditOpen = 14
-  effEditClose = 15
-
-  effEditIdle = 19
- 
-  effGetChunk = 23
-  effSetChunk = 24
- 
-  effNumOpcodes = 25
-
-class AEffectXOpcodes(object):
-  effProcessEvents = 25
-  effCanBeAutomated = 26
-  effString2Parameter = 27
-
-  effGetProgramNameIndexed = 29
- 
-  effGetInputProperties = 33
-  effGetOutputProperties = 34
-  effGetPlugCategory = 35
-
-  effOfflineNotify = 38
-  effOfflinePrepare = 39
-  effOfflineRun = 40
-  effProcessVarIo = 41
-  effSetSpeakerArrangement = 42
-
-  effSetBypass = 44
-  effGetEffectName = 45
-
-  effGetVendorString = 47
-  effGetProductString = 48
-  effGetVendorVersion = 49
-  effVendorSpecific = 50
-  effCanDo = 51
-  effGetTailSize = 52
-
-  effGetParameterProperties = 56
-  effGetVstVersion = 58
-
-  effEditKeyDown = 59
-  effEditKeyUp = 60
-  effSetEditKnobMode = 61
-
-  effGetMidiProgramName = 62
-  effGetCurrentMidiProgram = 63
-  effGetMidiProgramCategory = 64
-  effHasMidiProgramsChanged = 65
-  effGetMidiKeyName = 66
- 
-  effBeginSetProgram = 67
-  effEndSetProgram = 68
-
-  effGetSpeakerArrangement = 69
-  effShellGetNextPlugin = 70
-
-  effStartProcess = 71
-  effStopProcess = 72
-  effSetTotalSampleToProcess = 73
-  effSetPanLaw = 74
- 
-  effBeginLoadBank = 75
-  effBeginLoadProgram = 76
-
-  effSetProcessPrecision = 77
-  effGetNumMidiInputChannels = 78
-  effGetNumMidiOutputChannels = 79
-
-class AudioMasterOpcodes(object):
-  audioMasterAutomate = 0
-  audioMasterVersion = 1
-  audioMasterCurrentId = 2
-  audioMasterIdle = 3
 
 def basic_callback(effect, opcode, index, value, ptr, opt):
   """
@@ -166,10 +67,10 @@ class VSTPlugin(object):
     return rect.contents
     
   def set_sample_rate(self, sample_rate):
-	  return self.dispatcher(byref(self.__effect), AEffectOpcodes.effSetSampleRate, 0, 0, None, sample_rate)
+    return self.dispatcher(byref(self.__effect), AEffectOpcodes.effSetSampleRate, 0, 0, None, sample_rate)
 
   def set_block_size(self, block_size):
-	  return self.dispatcher(byref(self.__effect), AEffectOpcodes.effSetBlockSize, 0, block_size, None, 0)
+    return self.dispatcher(byref(self.__effect), AEffectOpcodes.effSetBlockSize, 0, block_size, None, 0)
 
   def process_replacing(self, inputs, outputs):
     f4ptr = POINTER(c_float)
@@ -188,7 +89,13 @@ class VSTPlugin(object):
       self.process_replacing(inputs, outputs)
     else:
       self.process_double_replacing(inputs, outputs)
-    
+      
+  def process_events(self, events):
+    midiEvents = VstEvents()
+    midiEvents.numEvents = len(events)
+    midiEvents.events = cast(VstMidiEventsPtr(events), VstEventsPtr)
+    return self.dispatcher(byref(self.__effect), AEffectXOpcodes.effProcessEvents, 0, 0, byref(midiEvents), 0.)
+      
   def set_parameter(self, index, value):
     return self.__set_param(byref(self.__effect), index, value)
   
@@ -204,6 +111,14 @@ class VSTPlugin(object):
     name = c_char_p('\0' * VstStringConstants.kVstMaxVendorStrLen)
     self.dispatcher(byref(self.__effect), AEffectXOpcodes.effGetVendorString, 0, 0, name, 0.)
     return name.value
+
+  def get_vendor_version(self):
+    name = c_char_p('\0' * VstStringConstants.kVstMaxVendorStrLen)
+    self.dispatcher(byref(self.__effect), AEffectXOpcodes.effGetVendorVersion, 0, 0, name, 0.)
+    return name.value
+
+  def get_version(self):
+    return self.__effect.version
 
   def get_product(self):
     name = c_char_p('\0' * VstStringConstants.kVstMaxProductStrLen)
@@ -245,17 +160,17 @@ class VSTPlugin(object):
     return name.value
 
   def get_parameter_name(self, index):
-    name = c_char_p('\0' * VstStringConstants.kVstMaxParamStrLen)
+    name = c_char_p('\0' * VstStringConstants.kVstExtMaxParamStrLen)
     self.dispatcher(byref(self.__effect), AEffectOpcodes.effGetParamName, index, 0, name, 0.)
     return name.value
 
   def get_parameter_label(self, index):
-    name = c_char_p('\0' * VstStringConstants.kVstMaxParamStrLen)
+    name = c_char_p('\0' * VstStringConstants.kVstExtMaxParamStrLen)
     self.dispatcher(byref(self.__effect), AEffectOpcodes.effGetParamLabel, index, 0, name, 0.)
     return name.value
 
   def get_parameter_display(self, index):
-    name = c_char_p('\0' * VstStringConstants.kVstMaxParamStrLen)
+    name = c_char_p('\0' * VstStringConstants.kVstExtMaxParamStrLen)
     self.dispatcher(byref(self.__effect), AEffectOpcodes.effGetParamDisplay, index, 0, name, 0.)
     return name.value
 
@@ -279,16 +194,18 @@ def dump_effect_properties(effect):
   print "Vendor name:", effect.get_vendor()
   print "Product name:", effect.get_product()
   
-  print "numPrograms = %d\nnumParams = %d\nnumInputs = %d\nnumOutputs = %d\n"% (effect.number_of_programs, effect.number_of_parameters, effect.number_of_inputs, effect.number_of_outputs)
+  print "numInputs: %d" % effect.number_of_inputs
+  print "numOutputs: %d" % effect.number_of_outputs
+  print "numParams: %d" % effect.number_of_parameters
+  print "numPrograms: %d" % effect.number_of_programs
+
+  print "hasEditor: %d" % effect.has_editor()
 
   for program_index in range(effect.number_of_programs):
-    try:
-      program_name = effect.get_program_name_indexed(program_index)
-      effect.set_program(program_index)
-      program_name = effect.get_program_name()
-      print "Program %03d: %s" % (program_index, program_name)
-    except:
-      pass
+    #program_name = effect.get_program_name_indexed(program_index)
+    effect.set_program(program_index)
+    program_name = effect.get_program_name()
+    print "Program %03d: %s" % (program_index, program_name)
 
   for param_index in range(effect.number_of_parameters):
     param_name = effect.get_parameter_name(param_index)

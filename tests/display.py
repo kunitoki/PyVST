@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import time
 
@@ -10,19 +10,6 @@ from pyvst import *
 SampleRate = 96000
 Samples = 2000000
 FreqMax = 20000
-
-def raise_gui(plugin):
-  import wx
-
-  app = wx.App()
-  frame = wx.Frame(None, -1, "Plugin editor")
-
-  plugin.open_edit(frame.GetHandle())
-  rect = plugin.get_erect()
-  frame.SetClientSize((rect.right, rect.bottom))
-  frame.Show()
-  app.MainLoop()
-  plugin.close_edit()
 
 def display(plugin, type):
   t = numpy.arange(Samples, dtype=type) / SampleRate
