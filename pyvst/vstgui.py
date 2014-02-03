@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 
 try:
-    import wx
-    HAVE_WX = True
-except ImportError:
-    HAVE_WX = False
-
-try:
     import PyQt4.QtCore as QtCore
     import PyQt4.QtGui as QtGui
     HAVE_PYQT = True
 except ImportError:
     HAVE_PYQT = False
+
+try:
+    import wx
+    HAVE_WX = True
+except ImportError:
+    HAVE_WX = False
     
 
 #===============================================================================
