@@ -2,9 +2,7 @@ import os
 import sys
 from ctypes import *
 
-#===============================================================================
-ROOT_PATH = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
-sys.path.append(ROOT_PATH)
+from utils import get_platform_plugin
 import pyvst
 
 
@@ -65,7 +63,7 @@ def test_programs(pluginpath):
 
 #===============================================================================
 if __name__ == "__main__":
-    pluginpath = os.path.join(ROOT_PATH, "bin", "linux64", "mda DX10.so")
+    pluginpath = get_platform_plugin("mda DX10")
 
     test_load(pluginpath)
     test_check_magic(pluginpath)

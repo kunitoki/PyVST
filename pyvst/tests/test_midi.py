@@ -3,9 +3,7 @@ import sys
 import struct
 import numpy
 
-#===============================================================================
-ROOT_PATH = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
-sys.path.append(ROOT_PATH)
+from utils import get_platform_plugin
 import pyvst
 
 
@@ -37,8 +35,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         plugin = pyvst.VSTPlugin(sys.argv[1])
     else:
-        pluginpath = os.path.join(ROOT_PATH, "bin", "linux64", "mda DX10.so")
-        plugin = pyvst.VSTPlugin(pluginpath)
+        plugin = pyvst.VSTPlugin(get_platform_plugin("mda DX10"))
 
     plugin.open()
     plugin.dump_properties(True, False)
