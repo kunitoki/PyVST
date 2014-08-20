@@ -253,6 +253,14 @@ class VSTPlugin(object):
             raise IndexError("No program with this index (%d)" % index)
         return name.value
 
+    def get_program(self):
+        """
+        Get program index number
+        """
+        retval = self.dispatcher(byref(self.__effect), AEffectOpcodes.effGetProgram, 0, 0, None, 0.)
+        #retval = cast(pointer(plugin.get_program()), POINTER(c_void_p)).contents.value
+        return retval
+
     def set_program(self, index):
         """
         Set program index number

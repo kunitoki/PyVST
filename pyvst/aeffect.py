@@ -84,7 +84,7 @@ class ERect(Structure):
 audiomaster_callback = CFUNCTYPE(c_void_p, POINTER(AEffect), c_int32, c_int32, c_long, c_void_p, c_float)
 
 def create_dispatcher_proc(pointer):
-    prototype = CFUNCTYPE(c_void_p, POINTER(AEffect), c_int32, c_int32, c_long, c_void_p, c_float)
+    prototype = CFUNCTYPE(VstIntPtr, POINTER(AEffect), c_int32, c_int32, c_long, c_void_p, c_float)
     return prototype(pointer)
 
 def create_process_proc(pointer):
