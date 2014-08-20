@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-
 from ctypes import *
-
 
 class Vst2StringConstants(object):
     kVstMaxNameLen = 64

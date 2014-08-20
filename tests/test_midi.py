@@ -1,10 +1,13 @@
-#!/usr/bin/env python
-
+import os
 import sys
 import struct
 import numpy
 
+#===============================================================================
+ROOT_PATH = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
+sys.path.append(ROOT_PATH)
 import pyvst
+
 
 #==============================================================================
 def generate_wave(plugin, filename, duration_samples, sample_rate, block_size):
@@ -17,7 +20,7 @@ def generate_wave(plugin, filename, duration_samples, sample_rate, block_size):
     # events
     events = [
         (0x90, 0x3C, 0x7F, 0),
-        (0x80, 0x3C, 0x00, sample_rate * 1),
+        (0x80, 0x3C, 0x00, sample_rate * 2),
     ]
 
     for i in xrange(duration_samples / block_size):
@@ -34,18 +37,19 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         plugin = pyvst.VSTPlugin(sys.argv[1])
     else:
-        raise Exception("Must pass a plugin !")
+        pluginpath = os.path.join(ROOT_PATH, "bin", "linux64", "mda DX10.so")
+        plugin = pyvst.VSTPlugin(pluginpath)
 
     plugin.open()
-    pyvst.dump_effect_properties(plugin, True, False)
+    plugin.dump_properties(True, False)
 
     #if plugin.has_editor():
-    #    pyvst.raise_gui(plugin)
+    #    plugin.open_gui()
 
     if plugin.is_synth() or plugin.can_receive_events():
         block_size = 2048
         sample_rate = 44100
-        duration_seconds = 2
+        duration_seconds = 5
         duration_samples = duration_seconds * sample_rate
 
         # processing plugin
@@ -54,29 +58,29 @@ if __name__ == '__main__':
         plugin.resume()
 
         # generate default wave
-        generate_wave(plugin, 'example_1.wav', duration_samples, sample_rate, block_size)
+        generate_wave(plugin, 'test_midi.wav', duration_samples, sample_rate, block_size)
 
         # save chunk
-        data = plugin.get_chunk()
-        if len(data) > 0:
-            f = open("example.chunk", "wb")
-            for d in data:
-                f.write(d)
-            f.close()
+        #data = plugin.get_chunk()
+        #if len(data) > 0:
+        #    f = open("example.chunk", "wb")
+        #    for d in data:
+        #        f.write(d)
+        #    f.close()
 
         # generate different wave
-        plugin.set_parameter(14, 0.90)
-        plugin.set_parameter(19, 0.75)
-        plugin.set_parameter(20, 1.00)
-        generate_wave(plugin, 'example_2.wav', duration_samples, sample_rate, block_size)
+        #plugin.set_parameter(14, 0.90)
+        #plugin.set_parameter(19, 0.75)
+        #plugin.set_parameter(20, 1.00)
+        #generate_wave(plugin, 'example_2.wav', duration_samples, sample_rate, block_size)
 
         # restore the sound saved
-        f = open("example.chunk", "rb")
-        data = f.read()
-        plugin.set_chunk(data)
-        f.close()
+        #f = open("example.chunk", "rb")
+        #data = f.read()
+        #plugin.set_chunk(data)
+        #f.close()
 
-        generate_wave(plugin, 'example_3.wav', duration_samples, sample_rate, block_size)
+        #generate_wave(plugin, 'example_3.wav', duration_samples, sample_rate, block_size)
 
         # generate a sound for each preset
         #for p in xrange(plugin.number_of_programs):

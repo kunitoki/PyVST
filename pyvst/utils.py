@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import wave
 import numpy
 import struct

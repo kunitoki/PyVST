@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import threading
+
 try:
     import PyQt4.QtCore as QtCore
     import PyQt4.QtGui as QtGui
@@ -54,3 +56,13 @@ elif HAVE_WX:
 #===============================================================================
 else:
     raise Exception("Must have at least wxPython or PyQT to use a vstgui")
+
+
+#===============================================================================
+class PluginWindowThread(threading.Thread):
+    def __init__(self, plugin):
+        threading.Thread.__init__(self)
+        self.plugin = plugin
+
+    def run(self):
+        raise_gui(self.plugin)
