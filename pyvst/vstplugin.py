@@ -165,7 +165,7 @@ class VSTPlugin(object):
             VstMidiEventArray = VstMidiEvent * len(thisEvents)
             vstMidiEvents = VstMidiEventArray()
             for idx in xrange(0, len(thisEvents)):
-                e = events[idx]
+                e = thisEvents[idx]
                 mev = vstMidiEvents[idx]
                 mev.type = VstEventTypes.kVstMidiType
                 mev.byteSize = c_int(sizeof(VstMidiEvent))
