@@ -28,6 +28,7 @@ if HAVE_PYQT:
         frame = HostWindow(app, plugin)
         plugin.open_edit(frame.winId())
         rect = plugin.get_erect()
+        frame.setWindowTitle("%s - %s" % (plugin.get_vendor(), plugin.get_name()))
         frame.resize(rect.right, rect.bottom)
         frame.show()
         app.exec_()
